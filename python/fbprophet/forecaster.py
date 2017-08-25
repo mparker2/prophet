@@ -1179,7 +1179,8 @@ class Prophet(object):
         return fig
 
     def plot_components(self, fcst, uncertainty=True, plot_cap=True,
-                        weekly_start=0, yearly_start=0):
+                        weekly_start=0, yearly_start=0,
+                        extra_regressors=False):
         """Plot the Prophet forecast components.
 
         Will plot whichever are available of: trend, holidays, weekly
@@ -1208,7 +1209,14 @@ class Prophet(object):
             components.append('holidays')
         components.extend([name for name in self.seasonalities
                            if name in fcst])
-        if len(self.extra_regressors) > 0 and 'extra_regressors' in fcst:
+        if isinstance(extra_regressors, list) and extra_regressors:
+            for regressor in extra_regressors:
+                if regressor in fcst:
+                    components.append(regressor)
+                else:
+                    raise KeyError('extra regressor {} not in forecast'.format(
+                            regressor))
+        elif len(self.extra_regressors) > 0 and 'extra_regressors' in fcst:
             components.append('extra_regressors')
         npanel = len(components)
 
@@ -1231,6 +1239,9 @@ class Prophet(object):
             elif plot == 'extra_regressors':
                 self.plot_forecast_component(
                     fcst, 'extra_regressors', ax, uncertainty, False)
+            elif plot in extra_regressors:
+                self.plot_forecast_component(
+                    fcst, plot, ax, uncertainty, False)
             else:
                 self.plot_seasonality(
                     name=plot, ax=ax, uncertainty=uncertainty)
