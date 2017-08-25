@@ -1142,7 +1142,7 @@ class Prophet(object):
         return pd.DataFrame({'ds': dates})
 
     def plot(self, fcst, ax=None, uncertainty=True, plot_cap=True, xlabel='ds',
-             ylabel='y'):
+             ylabel='y', plot_history=True):
         """Plot the Prophet forecast.
 
         Parameters
@@ -1164,7 +1164,8 @@ class Prophet(object):
             ax = fig.add_subplot(111)
         else:
             fig = ax.get_figure()
-        ax.plot(self.history['ds'].values, self.history['y'], 'k.')
+        if plot_history:
+            ax.plot(self.history['ds'].values, self.history['y'], 'k.')
         ax.plot(fcst['ds'].values, fcst['yhat'], ls='-', c='#0072B2')
         if 'cap' in fcst and plot_cap:
             ax.plot(fcst['ds'].values, fcst['cap'], ls='--', c='k')
